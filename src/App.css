@@ -1606,7 +1606,7 @@ main {
 .miner-thumb {
   position: absolute;
   left: 50%;
-  width: 76px;
+  width: 64px;
   height: 104px;
   border: 0;
   background: transparent;
@@ -1615,11 +1615,20 @@ main {
 
 .miner {
   position: relative;
-  width: 58px;
+  width: 50px;
   height: 88px;
   margin: 0 auto;
   image-rendering: pixelated;
   filter: drop-shadow(4px 5px 0 rgba(0, 0, 0, 0.36));
+  --skin: #b87954;
+  --skin-shadow: #8d5438;
+  --hair: #17100a;
+  --shirt-blue: #2f9ee5;
+  --shirt-blue-dark: #146caa;
+  --pants: #1e2f8c;
+  --pants-dark: #111b58;
+  --boot: #eef3f7;
+  --sole: #aeb9c2;
 }
 
 .miner span {
@@ -1629,12 +1638,24 @@ main {
 }
 
 .miner-head {
-  left: 15px;
-  top: 0;
-  width: 30px;
-  height: 30px;
-  background: #c5865b;
+  left: 11px;
+  top: 5px;
+  width: 28px;
+  height: 28px;
+  background:
+    linear-gradient(90deg, var(--skin) 0 86%, var(--skin-shadow) 86%),
+    var(--skin);
   z-index: 4;
+}
+
+.miner-head::after {
+  position: absolute;
+  left: 10px;
+  bottom: 5px;
+  width: 8px;
+  height: 3px;
+  background: #5d3024;
+  content: "";
 }
 
 .miner-head i {
@@ -1644,23 +1665,27 @@ main {
 }
 
 .miner-hair {
-  left: -3px;
-  top: -3px;
-  width: 30px;
-  height: 9px;
-  background: #4c2915;
-  box-shadow: 22px 6px 0 #4c2915;
+  left: -6px;
+  top: -5px;
+  width: 11px;
+  height: 11px;
+  background: var(--hair);
+  box-shadow:
+    7px -3px 0 var(--hair),
+    14px -3px 0 var(--hair),
+    21px -3px 0 var(--hair),
+    27px 2px 0 var(--hair);
 }
 
 .miner-eye {
-  top: 13px;
+  top: 20px;
   width: 5px;
   height: 5px;
-  background: #151515;
+  background: #111;
 }
 
 .miner-eye-left {
-  left: 7px;
+  left: 10px;
 }
 
 .miner-eye-right {
@@ -1668,26 +1693,42 @@ main {
 }
 
 .miner-body {
-  left: 13px;
-  top: 30px;
-  width: 34px;
-  height: 31px;
+  left: 9px;
+  top: 31px;
+  width: 32px;
+  height: 30px;
   background:
-    linear-gradient(90deg, #2676bd 0 28%, #35a3d9 28% 72%, #2676bd 72%),
-    #35a3d9;
+    linear-gradient(90deg, var(--shirt-blue-dark) 0 24%, var(--shirt-blue) 24% 76%, var(--shirt-blue-dark) 76%),
+    var(--shirt-blue);
   z-index: 3;
+}
+
+.miner-body::before {
+  content: none;
+}
+
+.miner-body::after {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  width: 8px;
+  height: 11px;
+  background: #eaf7ff;
+  content: "";
 }
 
 .miner-arm {
   top: 33px;
-  width: 13px;
+  width: 11px;
   height: 32px;
-  background: #b57750;
+  background:
+    linear-gradient(var(--shirt-blue-dark) 0 72%, var(--skin) 72%),
+    var(--shirt-blue-dark);
   z-index: 2;
 }
 
 .miner-arm-left {
-  left: 1px;
+  left: 0;
 }
 
 .miner-arm-right {
@@ -1697,18 +1738,24 @@ main {
 
 .miner-leg {
   bottom: 0;
-  width: 15px;
+  width: 13px;
   height: 31px;
-  background: #273a94;
+  background:
+    linear-gradient(var(--pants) 0 70%, var(--boot) 70% 88%, var(--sole) 88%),
+    var(--pants);
   z-index: 1;
 }
 
+.miner-leg::after {
+  content: none;
+}
+
 .miner-leg-left {
-  left: 13px;
+  left: 10px;
 }
 
 .miner-leg-right {
-  right: 12px;
+  right: 9px;
 }
 
 .miner-pickaxe {
@@ -1737,20 +1784,20 @@ main {
 
 .miner::after {
   position: absolute;
-  left: 12px;
+  left: 9px;
   bottom: -5px;
-  width: 34px;
+  width: 32px;
   height: 5px;
   background: rgba(0, 0, 0, 0.45);
   content: "";
 }
 
 .miner-idle-front .miner-pickaxe {
-  left: -3px;
-  top: 18px;
-  opacity: 1;
-  transform: rotate(-28deg);
-  z-index: 1;
+  left: -5px;
+  top: 22px;
+  opacity: 0.85;
+  transform: rotate(-24deg);
+  z-index: 0;
 }
 
 .miner-idle-front .miner-arm-left {
@@ -1766,17 +1813,22 @@ main {
 .miner-build-up-low,
 .miner-build-up-high,
 .miner-look-up {
-  transform: translateX(4px) scaleX(0.94);
+  transform: translateX(2px) scaleX(0.94);
 }
 
 .miner-look-down .miner-head,
 .miner-mine-down .miner-head {
-  transform: translateX(-2px) translateY(4px);
+  transform: translateX(-2px) translateY(5px);
+}
+
+.miner-look-down .miner-hair,
+.miner-mine-down .miner-hair {
+  transform: translateY(2px);
 }
 
 .miner-look-down .miner-eye-left,
 .miner-mine-down .miner-eye-left {
-  left: 14px;
+  left: 13px;
 }
 
 .miner-look-down .miner-eye-right,
@@ -1792,14 +1844,14 @@ main {
 
 .miner-look-down .miner-arm-right,
 .miner-mine-down .miner-arm-right {
-  transform: rotate(-55deg) translate(6px, -2px);
+  transform: rotate(-54deg) translate(5px, -2px);
 }
 
 .miner-look-down .miner-pickaxe,
 .miner-mine-down .miner-pickaxe {
   opacity: 1;
-  right: -10px;
-  top: 26px;
+  right: -8px;
+  top: 27px;
 }
 
 .miner-mine-down .miner-pickaxe {
@@ -1813,6 +1865,10 @@ main {
 
 .miner-build-up-low .miner-head {
   transform: translateY(5px);
+}
+
+.miner-build-up-low .miner-hair {
+  transform: translateY(2px);
 }
 
 .miner-build-up-low .miner-eye-left,
@@ -1847,6 +1903,11 @@ main {
 .miner-build-up-high .miner-head,
 .miner-look-up .miner-head {
   transform: translateY(-3px);
+}
+
+.miner-build-up-high .miner-hair,
+.miner-look-up .miner-hair {
+  transform: translateY(-2px);
 }
 
 .miner-build-up-high .miner-eye-left,
