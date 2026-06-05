@@ -85,25 +85,25 @@ const experiences = [
 
 const leadership = [
   {
-    icon: "chess",
+    icon: "iron-sword",
     title: "President - Chess Club, WHCI",
     dates: "Sep 2024-Jun 2025",
     text: "Co-founded and led the club. Organized tournaments, training sessions, and fundraising initiatives. Increased student engagement through club events and competitions."
   },
   {
-    icon: "service",
+    icon: "book-quill",
     title: "Vice President - Scholarly Service Society Toronto",
     dates: "Sep 2023-Jun 2025",
     text: "Managed partnerships, volunteer opportunities, and communications. Coordinated volunteer opportunities and Google Classroom communications for 30+ students."
   },
   {
-    icon: "un",
+    icon: "written-page",
     title: "Secretary - Model UN Club, WHCI",
     dates: "Sep 2023-Jun 2024",
     text: "Organized meetings and managed club communications. Designed digital posters and supported social media campaigns. Strengthened leadership and public speaking through conference participation."
   },
   {
-    icon: "team",
+    icon: "leather-shield",
     title: "Lead Manager & Coach Assistant - Cricket Team, WHCI",
     dates: "Sep 2023-Jun 2024",
     text: "Assisted with team organization, logistics, and practice coordination. Supported coaching staff during games and training activities."
@@ -113,7 +113,7 @@ const leadership = [
 const projects = [
   {
     featured: true,
-    icon: "ledger",
+    icon: "diamond-item",
     title: "ClawCourt (Agent 58)",
     org: "OpenClaw Toronto Hackathon",
     date: "May 2026",
@@ -126,7 +126,7 @@ const projects = [
     tags: ["Next.js", "Real-time", "AI", "Dashboard"]
   },
   {
-    icon: "leaf",
+    icon: "emerald-item",
     title: "EcoOffset Chrome Extension",
     org: "GenAI Genesis Hackathon",
     date: "2026",
@@ -138,7 +138,7 @@ const projects = [
     tags: ["React", "JavaScript", "Chrome Extension", "Sustainability"]
   },
   {
-    icon: "cards",
+    icon: "redstone-item",
     title: "Memory Match Mania",
     org: "Personal Project",
     date: "Jun 2024",
@@ -150,7 +150,7 @@ const projects = [
     tags: ["JavaScript", "Game Dev", "UI/UX"]
   },
   {
-    icon: "quiz",
+    icon: "copper-item",
     title: "Family Feud Game",
     org: "Personal Project",
     date: "Jan 2023",
@@ -162,7 +162,7 @@ const projects = [
     tags: ["Python", "Game Logic", "Multi-level"]
   },
   {
-    icon: "grid",
+    icon: "lapis-item",
     title: "Tic Tac Toe",
     org: "Personal Project",
     date: "Dec 2022",
@@ -209,6 +209,13 @@ const trades = [
   ["GitHub", "purple", "https://github.com/kevinupadhyay"],
   ["Email", "green", `mailto:${EMAIL}`],
   ["Phone", "orange", "tel:+14374224234"]
+];
+
+const quickInventory = [
+  ["Current Spawn", "Waterloo, ON"],
+  ["Class", "Mathematics Student"],
+  ["Build Style", "Hackathons, web apps, extensions, games"],
+  ["Main Quest", "Build useful software and keep leveling up"]
 ];
 
 function useScrollState() {
@@ -423,26 +430,12 @@ function Hero() {
         <span className="bird bird-b"></span>
       </div>
       <div className="hero-content reveal">
-        <p className="spawn-label">Spawn Point</p>
+        <p className="spawn-label">Welcome to my world</p>
         <h1>
           <span>KEVIN</span>
           <strong>UPADHYAY</strong>
         </h1>
         <div className="subtitle-box">Waterloo Math Student / Builder / Hacker / Developer</div>
-        <div className="xp-bars">
-          {[
-            ["Honour Roll", "100%"],
-            ["Skills", "88%"],
-            ["Projects", "76%"]
-          ].map(([label, width]) => (
-            <div className="xp-row" key={label}>
-              <span>{label}</span>
-              <div className="xp-track">
-                <i style={{ width }}></i>
-              </div>
-            </div>
-          ))}
-        </div>
         <div className="hero-actions">
           <button className="pixel-button green" type="button" onClick={() => scrollToId("wood")}>
             START MINING
@@ -472,6 +465,15 @@ function WoodAge() {
             award-winning hackathon apps to interactive games. I thrive on hard problems, fast
             collaboration, and leaving things better than I found them.
           </p>
+          <div className="quick-inventory" aria-label="Quick Inventory">
+            <h3>Quick Inventory</h3>
+            {quickInventory.map(([label, value]) => (
+              <div className="quick-row" key={label}>
+                <span>{label}</span>
+                <strong>{value}</strong>
+              </div>
+            ))}
+          </div>
         </article>
         <article className="pixel-card reveal delay-1">
           <h2>PLAYER STATS</h2>
@@ -522,6 +524,7 @@ function Experience() {
               <span className="accordion-meta">
                 {item.badge && <i>{item.badge}</i>}
                 {item.dates}
+                <b className="expand-arrow">{open === index ? "▲" : "▼"}</b>
               </span>
             </button>
             <div className="accordion-body">

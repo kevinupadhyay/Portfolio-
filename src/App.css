@@ -169,6 +169,15 @@ main {
   content: "";
 }
 
+.layer::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background-repeat: no-repeat;
+  content: "";
+}
+
 .layer > * {
   position: relative;
   z-index: 1;
@@ -185,37 +194,82 @@ main {
 
 .layer-wood {
   background:
+    linear-gradient(90deg, rgba(68, 38, 20, 0.28) 0 16px, transparent 16px 42px),
     linear-gradient(180deg, #4d2f1d, #7a4b2a 48%, #5f351f),
     var(--dirt);
   color: #fff3cf;
 }
 
+.layer-wood::after {
+  background-image:
+    radial-gradient(circle, rgba(56, 33, 19, 0.72) 0 5px, transparent 6px),
+    radial-gradient(circle, rgba(123, 75, 42, 0.8) 0 7px, transparent 8px);
+  background-position: 12% 74%, 84% 28%;
+  background-size: 96px 96px, 140px 140px;
+}
+
 .layer-stone {
   background:
+    linear-gradient(90deg, rgba(40, 45, 52, 0.18) 0 18px, transparent 18px 46px),
     radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.13), transparent 22%),
     linear-gradient(180deg, #78828e, #4f5964);
   color: #f9fafb;
 }
 
+.layer-stone::after {
+  background-image:
+    radial-gradient(circle, #1f252c 0 5px, transparent 6px),
+    radial-gradient(circle, #d8893a 0 4px, transparent 5px);
+  background-position: 18% 38%, 76% 66%;
+  background-size: 120px 120px, 150px 150px;
+}
+
 .layer-iron {
   background:
+    linear-gradient(135deg, rgba(69, 39, 24, 0.25) 0 18px, transparent 18px 54px),
     radial-gradient(circle at 80% 10%, rgba(255, 195, 105, 0.35), transparent 24%),
     linear-gradient(180deg, #8c4c23, #c37532 44%, #573421);
   color: #fff7e6;
 }
 
+.layer-iron::after {
+  background-image:
+    radial-gradient(circle, #d8893a 0 5px, transparent 6px),
+    radial-gradient(circle, #c77a3f 0 4px, transparent 5px);
+  background-position: 22% 72%, 86% 36%;
+  background-size: 150px 150px, 115px 115px;
+}
+
 .layer-diamond {
   background:
+    linear-gradient(90deg, rgba(2, 20, 24, 0.34) 0 20px, transparent 20px 52px),
     radial-gradient(circle at 20% 20%, rgba(38, 215, 208, 0.34), transparent 30%),
     linear-gradient(180deg, #082b33, #0a4650 45%, #06262c);
   color: #e9ffff;
 }
 
+.layer-diamond::after {
+  background-image:
+    radial-gradient(circle, #26d7d0 0 5px, transparent 6px),
+    radial-gradient(circle, #315fff 0 4px, transparent 5px);
+  background-position: 17% 62%, 82% 24%;
+  background-size: 128px 128px, 180px 180px;
+}
+
 .layer-netherite {
   background:
+    linear-gradient(45deg, rgba(38, 31, 44, 0.34) 0 18px, transparent 18px 52px),
     radial-gradient(circle at 88% 20%, rgba(136, 90, 255, 0.22), transparent 26%),
     linear-gradient(180deg, #17151a, #09090c 60%, #141014);
   color: #f6f0ff;
+}
+
+.layer-netherite::after {
+  background-image:
+    radial-gradient(circle, #7c3aed 0 5px, transparent 6px),
+    radial-gradient(circle, #d64747 0 4px, transparent 5px);
+  background-position: 24% 34%, 78% 70%;
+  background-size: 170px 170px, 138px 138px;
 }
 
 .layer-village {
@@ -226,8 +280,19 @@ main {
   color: #fff6da;
 }
 
+.layer-village::after {
+  background-image:
+    radial-gradient(circle, rgba(255, 196, 82, 0.65) 0 6px, transparent 7px),
+    radial-gradient(circle, rgba(40, 35, 28, 0.9) 0 8px, transparent 9px);
+  background-position: 18% 30%, 82% 58%;
+  background-size: 150px 150px, 180px 180px;
+}
+
 .hero-content {
-  max-width: 1030px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-right: clamp(28px, 7vw, 100px);
+  text-align: center;
 }
 
 .spawn-label,
@@ -271,7 +336,7 @@ main {
 .subtitle-box {
   width: fit-content;
   max-width: 100%;
-  margin-top: 24px;
+  margin: 24px auto 0;
   border: 5px solid #2a1808;
   background: rgba(255, 248, 220, 0.94);
   box-shadow: var(--shadow);
@@ -281,7 +346,7 @@ main {
 }
 
 .xp-bars {
-  display: grid;
+  display: none;
   max-width: 620px;
   gap: 12px;
   margin-top: 30px;
@@ -314,6 +379,7 @@ main {
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 14px;
   margin-top: 32px;
 }
@@ -491,6 +557,45 @@ main {
   font-weight: 650;
 }
 
+.quick-inventory {
+  display: grid;
+  gap: 9px;
+  margin-top: 22px;
+  border-top: 4px solid rgba(42, 24, 8, 0.42);
+  padding-top: 18px;
+}
+
+.quick-inventory h3 {
+  margin: 0 0 4px;
+  color: #2a1808;
+  font-family: var(--pixel);
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+
+.quick-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 10px;
+  align-items: center;
+  border: 3px solid #2a1808;
+  background:
+    linear-gradient(90deg, rgba(255, 223, 72, 0.33), transparent 42%),
+    #fff1b8;
+  padding: 9px 10px;
+}
+
+.quick-row span {
+  color: #59320f;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.quick-row strong {
+  color: #1f160d;
+  font-size: 0.92rem;
+}
+
 .stat-list {
   display: grid;
   gap: 10px;
@@ -578,6 +683,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
   gap: 8px;
   color: #293340;
   font-weight: 900;
@@ -589,6 +695,19 @@ main {
   color: white;
   font-style: normal;
   padding: 2px 7px;
+}
+
+.expand-arrow {
+  display: grid;
+  min-width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 3px solid #172011;
+  background: #ffdf48;
+  color: #172011;
+  font-family: var(--pixel);
+  font-size: 0.78rem;
+  line-height: 1;
 }
 
 .accordion-body {
@@ -752,6 +871,130 @@ main {
   background:
     linear-gradient(#251508 0 5px, transparent 5px 13px, #251508 13px 18px, transparent 18px 27px, #251508 27px),
     linear-gradient(90deg, #251508 0 5px, transparent 5px 13px, #251508 13px 18px, transparent 18px 27px, #251508 27px);
+}
+
+.icon-iron-sword::before {
+  width: 8px;
+  height: 38px;
+  background: #cfd6de;
+  border: 3px solid #251508;
+  transform: rotate(45deg);
+}
+
+.icon-iron-sword::after {
+  width: 30px;
+  height: 8px;
+  background: #8b532a;
+  border: 3px solid #251508;
+  transform: rotate(45deg) translate(6px, 12px);
+}
+
+.icon-book-quill::before {
+  left: 8px;
+  width: 28px;
+  height: 32px;
+  border: 4px solid #251508;
+  background:
+    linear-gradient(90deg, #8b3f2b 0 45%, #fff1b8 45% 55%, #6b2f23 55%),
+    #8b3f2b;
+}
+
+.icon-book-quill::after {
+  right: 7px;
+  top: 7px;
+  width: 8px;
+  height: 38px;
+  border: 3px solid #251508;
+  background: #f7f1dc;
+  transform: rotate(28deg);
+}
+
+.icon-written-page::before {
+  width: 32px;
+  height: 36px;
+  border: 4px solid #251508;
+  background:
+    linear-gradient(#251508 0 3px, transparent 3px 9px, #251508 9px 12px, transparent 12px 18px, #251508 18px 21px, transparent 21px),
+    #fff1b8;
+}
+
+.icon-written-page::after {
+  right: 7px;
+  top: 7px;
+  width: 10px;
+  height: 10px;
+  background: #d1a45f;
+  border-left: 3px solid #251508;
+  border-bottom: 3px solid #251508;
+}
+
+.icon-leather-shield::before {
+  width: 34px;
+  height: 40px;
+  border: 4px solid #251508;
+  background:
+    linear-gradient(90deg, #7b3f22 0 42%, #a45d32 42% 58%, #5f321d 58%),
+    #7b3f22;
+  clip-path: polygon(50% 0, 95% 16%, 82% 78%, 50% 100%, 18% 78%, 5% 16%);
+}
+
+.icon-leather-shield::after {
+  top: 13px;
+  width: 18px;
+  height: 7px;
+  background: #251508;
+}
+
+.icon-diamond-item::before,
+.icon-emerald-item::before,
+.icon-redstone-item::before,
+.icon-copper-item::before,
+.icon-lapis-item::before {
+  width: 30px;
+  height: 30px;
+  border: 4px solid #251508;
+  transform: rotate(45deg);
+}
+
+.icon-diamond-item::before {
+  background:
+    linear-gradient(135deg, #ffffff 0 18%, transparent 18%),
+    #26d7d0;
+}
+
+.icon-emerald-item::before {
+  background:
+    linear-gradient(135deg, #b9ffd8 0 18%, transparent 18%),
+    #1fc66a;
+}
+
+.icon-redstone-item::before {
+  background:
+    linear-gradient(135deg, #ffb1a8 0 18%, transparent 18%),
+    #d64747;
+}
+
+.icon-copper-item::before {
+  background:
+    linear-gradient(135deg, #ffd6a6 0 18%, transparent 18%),
+    #c77a3f;
+}
+
+.icon-lapis-item::before {
+  background:
+    linear-gradient(135deg, #b8d8ff 0 18%, transparent 18%),
+    #315fff;
+}
+
+.icon-diamond-item::after,
+.icon-emerald-item::after,
+.icon-redstone-item::after,
+.icon-copper-item::after,
+.icon-lapis-item::after {
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  transform: translate(-7px, -7px);
 }
 
 .trophy::before {
@@ -1313,31 +1556,51 @@ main {
 }
 
 .block-sky {
-  background: #75cfff;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0 18%, transparent 18%),
+    #75cfff;
 }
 
 .block-wood {
-  background: linear-gradient(135deg, #4caf35 0 35%, #7b4b2a 35%);
+  background:
+    linear-gradient(#4caf35 0 24%, transparent 24%),
+    radial-gradient(circle at 22% 55%, #5a321c 0 10%, transparent 11%),
+    radial-gradient(circle at 72% 78%, #98613a 0 8%, transparent 9%),
+    linear-gradient(135deg, #7b4b2a 0 45%, #5f351f 45% 70%, #8a5631 70%);
 }
 
 .block-stone {
-  background: #747b84;
+  background:
+    radial-gradient(circle at 22% 28%, #8d96a1 0 10%, transparent 11%),
+    radial-gradient(circle at 72% 68%, #4e5660 0 11%, transparent 12%),
+    linear-gradient(135deg, #747b84 0 45%, #5f6873 45% 72%, #858d96 72%);
 }
 
 .block-iron {
-  background: linear-gradient(135deg, #d8893a 0 45%, #8a4922 45%);
+  background:
+    radial-gradient(circle at 28% 38%, #ffc06a 0 10%, transparent 11%),
+    radial-gradient(circle at 72% 68%, #d8893a 0 9%, transparent 10%),
+    linear-gradient(135deg, #6b422a 0 38%, #8a4922 38% 74%, #4f3324 74%);
 }
 
 .block-diamond {
-  background: linear-gradient(135deg, #26d7d0 0 45%, #083840 45%);
+  background:
+    radial-gradient(circle at 30% 36%, #79fff8 0 10%, transparent 11%),
+    radial-gradient(circle at 76% 64%, #26d7d0 0 8%, transparent 9%),
+    linear-gradient(135deg, #083840 0 45%, #06262c 45% 72%, #0a4650 72%);
 }
 
 .block-netherite {
-  background: linear-gradient(135deg, #292832 0 45%, #0b0b0e 45%);
+  background:
+    radial-gradient(circle at 28% 38%, #72547d 0 9%, transparent 10%),
+    radial-gradient(circle at 70% 70%, #3d3445 0 11%, transparent 12%),
+    linear-gradient(135deg, #292832 0 45%, #0b0b0e 45% 72%, #17151a 72%);
 }
 
 .block-village {
-  background: radial-gradient(circle, #f7b94d 0 18%, #080606 20%);
+  background:
+    radial-gradient(circle at 50% 44%, #f7b94d 0 11%, rgba(247, 185, 77, 0.32) 12% 24%, transparent 25%),
+    linear-gradient(135deg, #17100c 0 42%, #080606 42% 72%, #24160d 72%);
 }
 
 .miner-thumb {
