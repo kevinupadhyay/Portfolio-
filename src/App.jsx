@@ -256,9 +256,41 @@ function scrollToId(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function MinerSprite({ direction = "idle" }) {
+function CustomCursor() {
+  useEffect(() => {
+    const pointerQuery = window.matchMedia("(pointer: fine)");
+
+    const updateCursorMode = () => {
+      document.body.classList.toggle("custom-cursor-enabled", pointerQuery.matches);
+    };
+
+    updateCursorMode();
+    pointerQuery.addEventListener("change", updateCursorMode);
+
+    return () => {
+      document.body.classList.remove("custom-cursor-enabled");
+      pointerQuery.removeEventListener("change", updateCursorMode);
+    };
+  }, []);
+
+  return null;
+}
+
+function getMinerState(direction, currentBlock, crackStage) {
+  if (direction === "down") {
+    return crackStage <= 1 ? "look-down" : "mine-down";
+  }
+
+  if (direction === "up") {
+    return currentBlock % 5 <= 1 ? "build-up-high" : "build-up-low";
+  }
+
+  return "idle-front";
+}
+
+function PixelMiner({ state = "idle-front" }) {
   return (
-    <div className={`miner miner-${direction}`} aria-hidden="true">
+    <div className={`miner miner-${state}`} aria-hidden="true" data-state={state}>
       <span className="miner-pickaxe">
         <i></i>
       </span>
@@ -279,8 +311,12 @@ function MinerSprite({ direction = "idle" }) {
 function MiningScrollbar({ progress, direction }) {
   const railRef = useRef(null);
   const [dragging, setDragging] = useState(false);
-  const totalBlocks = 42;
+  const totalBlocks = 44;
+  const blockProgress = progress * totalBlocks;
   const currentBlock = Math.min(Math.floor(progress * totalBlocks), totalBlocks - 1);
+  const crackStage = Math.min(Math.floor((blockProgress % 1) * 4) + 1, 4);
+  const minerState = getMinerState(direction, currentBlock, crackStage);
+  const footPosition = `clamp(112px, calc(${progress * 100}% + 12px), calc(100% - 4px))`;
 
   const blocks = useMemo(
     () =>
@@ -321,7 +357,7 @@ function MiningScrollbar({ progress, direction }) {
           const placing = index === currentBlock && direction === "up";
           return (
             <span
-              className={`mine-block block-${type} ${broken ? "is-broken" : ""} ${cracking ? "is-cracking" : ""} ${placing ? "is-placing" : ""}`}
+              className={`mine-block block-${type} ${broken ? "is-broken" : ""} ${cracking ? `is-cracking crack-${crackStage}` : ""} ${placing ? "is-placing" : ""}`}
               key={`${type}-${index}`}
             ></span>
           );
@@ -330,13 +366,13 @@ function MiningScrollbar({ progress, direction }) {
           className="miner-thumb"
           type="button"
           aria-label="Drag mining progress"
-          style={{ top: `clamp(56px, ${progress * 100}%, calc(100% - 56px))` }}
+          style={{ top: footPosition }}
           onPointerDown={(event) => {
             event.preventDefault();
             setDragging(true);
           }}
         >
-          <MinerSprite direction={direction} />
+          <PixelMiner state={minerState} />
         </button>
       </div>
     </aside>
@@ -521,12 +557,44 @@ function Leadership() {
 }
 
 function Projects() {
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  useEffect(() => {
+    if (!selectedProject) return undefined;
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setSelectedProject(null);
+      }
+    };
+
+    document.body.classList.add("modal-open");
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.body.classList.remove("modal-open");
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [selectedProject]);
+
   return (
     <section className="layer layer-diamond" id="diamond">
-      <SectionTitle label="[ DIAMOND PROJECTS ]" subtitle="Click an ore block to inspect" />
+      <SectionTitle label="[ DIAMOND PROJECTS ]" subtitle="Mine a project block to inspect." />
       <div className="project-grid">
         {projects.map((item) => (
-          <article className={`project-card reveal ${item.featured ? "featured" : ""}`} key={item.title}>
+          <article
+            className={`project-card reveal ${item.featured ? "featured" : ""}`}
+            key={item.title}
+            role="button"
+            tabIndex={0}
+            onClick={() => setSelectedProject(item)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setSelectedProject(item);
+              }
+            }}
+          >
             <div className={`project-icon icon-${item.icon}`} aria-hidden="true"></div>
             <div className="meta-line">
               <span>{item.date}</span>
@@ -540,10 +608,68 @@ function Projects() {
               ))}
             </ul>
             <TagRow tags={item.tags} />
+            <div className="inspect-label">Inspect Project</div>
           </article>
         ))}
       </div>
+      {selectedProject && (
+        <ProjectInspectionModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      )}
     </section>
+  );
+}
+
+function ProjectInspectionModal({ project, onClose }) {
+  return (
+    <div className="project-modal" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+      <button className="project-modal-backdrop" type="button" aria-label="Close project inspection" onClick={onClose}></button>
+      <article className="inventory-window">
+        <div className="inventory-header">
+          <div>
+            <p>Project Inspection</p>
+            <h2 id="project-modal-title">{project.title}</h2>
+          </div>
+          <button className="inventory-close" type="button" onClick={onClose} aria-label="Close project inspection">
+            X
+          </button>
+        </div>
+
+        <div className="inventory-grid">
+          <div className="inventory-slot project-slot">
+            <div className={`project-icon icon-${project.icon}`} aria-hidden="true"></div>
+          </div>
+          <div className="inventory-details">
+            <div className="meta-line">
+              <span>{project.date}</span>
+              <span>{project.org}</span>
+            </div>
+            {project.awards && (
+              <div className="award-badges">
+                {project.awards.split(",").map((award) => (
+                  <span key={award.trim()}>{award.trim()}</span>
+                ))}
+              </div>
+            )}
+            <TagRow tags={project.tags} />
+          </div>
+        </div>
+
+        <div className="inventory-section">
+          <h3>Quest Log</h3>
+          <ul>
+            {project.bullets.map((bullet) => (
+              <li key={bullet}>{bullet}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="inventory-actions">
+          <button type="button">GitHub Coming Soon</button>
+          <button type="button">Demo Coming Soon</button>
+          <button type="button">Devpost Coming Soon</button>
+        </div>
+      </article>
+    </div>
   );
 }
 
@@ -691,6 +817,7 @@ export default function App() {
 
   return (
     <>
+      <CustomCursor />
       <RevealController />
       <Navbar active={scroll.active} />
       <MiningScrollbar progress={scroll.progress} direction={scroll.direction} />
