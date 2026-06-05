@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const EMAIL = "kevinkdu23@gmail.com";
 
@@ -85,25 +85,25 @@ const experiences = [
 
 const leadership = [
   {
-    icon: "C",
+    icon: "chess",
     title: "President - Chess Club, WHCI",
     dates: "Sep 2024-Jun 2025",
     text: "Co-founded and led the club. Organized tournaments, training sessions, and fundraising initiatives. Increased student engagement through club events and competitions."
   },
   {
-    icon: "S",
+    icon: "service",
     title: "Vice President - Scholarly Service Society Toronto",
     dates: "Sep 2023-Jun 2025",
     text: "Managed partnerships, volunteer opportunities, and communications. Coordinated volunteer opportunities and Google Classroom communications for 30+ students."
   },
   {
-    icon: "M",
+    icon: "un",
     title: "Secretary - Model UN Club, WHCI",
     dates: "Sep 2023-Jun 2024",
     text: "Organized meetings and managed club communications. Designed digital posters and supported social media campaigns. Strengthened leadership and public speaking through conference participation."
   },
   {
-    icon: "T",
+    icon: "team",
     title: "Lead Manager & Coach Assistant - Cricket Team, WHCI",
     dates: "Sep 2023-Jun 2024",
     text: "Assisted with team organization, logistics, and practice coordination. Supported coaching staff during games and training activities."
@@ -113,7 +113,7 @@ const leadership = [
 const projects = [
   {
     featured: true,
-    icon: "D",
+    icon: "ledger",
     title: "ClawCourt (Agent 58)",
     org: "OpenClaw Toronto Hackathon",
     date: "May 2026",
@@ -126,7 +126,7 @@ const projects = [
     tags: ["Next.js", "Real-time", "AI", "Dashboard"]
   },
   {
-    icon: "E",
+    icon: "leaf",
     title: "EcoOffset Chrome Extension",
     org: "GenAI Genesis Hackathon",
     date: "2026",
@@ -138,7 +138,7 @@ const projects = [
     tags: ["React", "JavaScript", "Chrome Extension", "Sustainability"]
   },
   {
-    icon: "M",
+    icon: "cards",
     title: "Memory Match Mania",
     org: "Personal Project",
     date: "Jun 2024",
@@ -150,7 +150,7 @@ const projects = [
     tags: ["JavaScript", "Game Dev", "UI/UX"]
   },
   {
-    icon: "F",
+    icon: "quiz",
     title: "Family Feud Game",
     org: "Personal Project",
     date: "Jan 2023",
@@ -162,7 +162,7 @@ const projects = [
     tags: ["Python", "Game Logic", "Multi-level"]
   },
   {
-    icon: "T",
+    icon: "grid",
     title: "Tic Tac Toe",
     org: "Personal Project",
     date: "Dec 2022",
@@ -259,8 +259,14 @@ function scrollToId(id) {
 function MinerSprite({ direction = "idle" }) {
   return (
     <div className={`miner miner-${direction}`} aria-hidden="true">
-      <span className="miner-pickaxe"></span>
-      <span className="miner-head"></span>
+      <span className="miner-pickaxe">
+        <i></i>
+      </span>
+      <span className="miner-head">
+        <i className="miner-hair"></i>
+        <i className="miner-eye miner-eye-left"></i>
+        <i className="miner-eye miner-eye-right"></i>
+      </span>
       <span className="miner-body"></span>
       <span className="miner-arm miner-arm-left"></span>
       <span className="miner-arm miner-arm-right"></span>
@@ -312,9 +318,10 @@ function MiningScrollbar({ progress, direction }) {
         {blocks.map((type, index) => {
           const broken = index < currentBlock;
           const cracking = index === currentBlock && direction === "down";
+          const placing = index === currentBlock && direction === "up";
           return (
             <span
-              className={`mine-block block-${type} ${broken ? "is-broken" : ""} ${cracking ? "is-cracking" : ""}`}
+              className={`mine-block block-${type} ${broken ? "is-broken" : ""} ${cracking ? "is-cracking" : ""} ${placing ? "is-placing" : ""}`}
               key={`${type}-${index}`}
             ></span>
           );
@@ -323,7 +330,7 @@ function MiningScrollbar({ progress, direction }) {
           className="miner-thumb"
           type="button"
           aria-label="Drag mining progress"
-          style={{ top: `${progress * 100}%` }}
+          style={{ top: `clamp(56px, ${progress * 100}%, calc(100% - 56px))` }}
           onPointerDown={(event) => {
             event.preventDefault();
             setDragging(true);
@@ -502,7 +509,7 @@ function Leadership() {
       <div className="leadership-grid">
         {leadership.map((item) => (
           <article className="pixel-card icon-card reveal" key={item.title}>
-            <div className="pixel-icon">{item.icon}</div>
+            <div className={`pixel-icon icon-${item.icon}`} aria-hidden="true"></div>
             <span className="date">{item.dates}</span>
             <h2>{item.title}</h2>
             <p>{item.text}</p>
@@ -520,7 +527,7 @@ function Projects() {
       <div className="project-grid">
         {projects.map((item) => (
           <article className={`project-card reveal ${item.featured ? "featured" : ""}`} key={item.title}>
-            <div className="project-icon">{item.icon}</div>
+            <div className={`project-icon icon-${item.icon}`} aria-hidden="true"></div>
             <div className="meta-line">
               <span>{item.date}</span>
               <span>{item.org}</span>
@@ -579,7 +586,7 @@ function SkillsAndChest() {
       <div className="award-grid">
         {awards.map(([name, place, text]) => (
           <article className="pixel-card award-card reveal" key={name}>
-            <div className="trophy">T</div>
+            <div className="trophy" aria-hidden="true"></div>
             <h2>{name}</h2>
             <span>{place}</span>
             <p>{text}</p>

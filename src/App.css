@@ -53,7 +53,7 @@ a {
 }
 
 main {
-  overflow: hidden;
+  overflow-x: clip;
 }
 
 .nav {
@@ -595,6 +595,7 @@ main {
 .pixel-icon,
 .project-icon,
 .trophy {
+  position: relative;
   display: grid;
   width: 54px;
   height: 54px;
@@ -605,6 +606,138 @@ main {
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.25);
   font-family: var(--pixel);
   font-weight: 900;
+}
+
+.pixel-icon::before,
+.pixel-icon::after,
+.project-icon::before,
+.project-icon::after,
+.trophy::before,
+.trophy::after {
+  position: absolute;
+  content: "";
+}
+
+.icon-chess::before {
+  width: 14px;
+  height: 24px;
+  background: #251508;
+  box-shadow: -7px 8px 0 #251508, 7px 8px 0 #251508, 0 -10px 0 #251508, 0 20px 0 7px #251508;
+}
+
+.icon-service::before {
+  width: 28px;
+  height: 28px;
+  border: 6px solid #251508;
+  transform: rotate(45deg);
+}
+
+.icon-service::after {
+  width: 8px;
+  height: 8px;
+  background: #251508;
+}
+
+.icon-un::before {
+  width: 30px;
+  height: 22px;
+  border-left: 7px solid #251508;
+  border-bottom: 5px solid #251508;
+}
+
+.icon-un::after {
+  top: 10px;
+  right: 9px;
+  width: 26px;
+  height: 16px;
+  background: #251508;
+  clip-path: polygon(0 0, 100% 25%, 0 55%);
+}
+
+.icon-team::before {
+  width: 14px;
+  height: 14px;
+  background: #251508;
+  box-shadow: -16px 7px 0 #251508, 16px 7px 0 #251508, 0 21px 0 12px #251508;
+}
+
+.icon-ledger::before {
+  width: 28px;
+  height: 32px;
+  border: 5px solid #251508;
+  background:
+    linear-gradient(#251508 0 4px, transparent 4px 10px, #251508 10px 14px, transparent 14px 20px, #251508 20px 24px, transparent 24px);
+}
+
+.icon-leaf::before {
+  width: 30px;
+  height: 24px;
+  border: 5px solid #251508;
+  border-radius: 24px 0 24px 0;
+  transform: rotate(-20deg);
+}
+
+.icon-leaf::after {
+  width: 5px;
+  height: 32px;
+  background: #251508;
+  transform: rotate(45deg);
+}
+
+.icon-cards::before {
+  width: 22px;
+  height: 28px;
+  border: 5px solid #251508;
+  background: #fff1a8;
+  transform: translate(-5px, 2px) rotate(-8deg);
+}
+
+.icon-cards::after {
+  width: 22px;
+  height: 28px;
+  border: 5px solid #251508;
+  background: #ffe36c;
+  transform: translate(7px, -3px) rotate(8deg);
+}
+
+.icon-quiz::before {
+  width: 28px;
+  height: 24px;
+  border: 5px solid #251508;
+  border-radius: 50%;
+}
+
+.icon-quiz::after {
+  bottom: 7px;
+  width: 8px;
+  height: 8px;
+  background: #251508;
+  box-shadow: 0 -12px 0 #251508;
+}
+
+.icon-grid::before {
+  width: 32px;
+  height: 32px;
+  background:
+    linear-gradient(#251508 0 5px, transparent 5px 13px, #251508 13px 18px, transparent 18px 27px, #251508 27px),
+    linear-gradient(90deg, #251508 0 5px, transparent 5px 13px, #251508 13px 18px, transparent 18px 27px, #251508 27px);
+}
+
+.trophy::before {
+  top: 9px;
+  width: 24px;
+  height: 22px;
+  border: 5px solid #251508;
+  background: #ffd83d;
+  box-shadow: -16px 3px 0 -5px #ffd83d, 16px 3px 0 -5px #ffd83d;
+}
+
+.trophy::after {
+  bottom: 8px;
+  width: 28px;
+  height: 10px;
+  background: #251508;
+  box-shadow: 0 -10px 0 -2px #251508;
 }
 
 .project-grid {
@@ -853,11 +986,11 @@ main {
 
 .mining-scrollbar {
   position: fixed;
-  top: 88px;
+  top: 96px;
   right: 16px;
   z-index: 45;
   width: 52px;
-  height: calc(100vh - 112px);
+  height: calc(100vh - 128px);
   pointer-events: none;
 }
 
@@ -897,6 +1030,12 @@ main {
   transform: scale(0.82);
 }
 
+.mine-block.is-placing {
+  opacity: 1;
+  transform: scale(1.08);
+  box-shadow: inset 0 0 0 3px rgba(255, 223, 72, 0.72), 0 0 12px rgba(255, 223, 72, 0.42);
+}
+
 .block-sky {
   background: #75cfff;
 }
@@ -928,8 +1067,8 @@ main {
 .miner-thumb {
   position: absolute;
   left: 50%;
-  width: 62px;
-  height: 82px;
+  width: 76px;
+  height: 104px;
   border: 0;
   background: transparent;
   transform: translate(-50%, -50%);
@@ -937,107 +1076,184 @@ main {
 
 .miner {
   position: relative;
-  width: 42px;
-  height: 66px;
+  width: 58px;
+  height: 88px;
   margin: 0 auto;
   image-rendering: pixelated;
+  filter: drop-shadow(4px 5px 0 rgba(0, 0, 0, 0.36));
 }
 
 .miner span {
   position: absolute;
   display: block;
-  border: 2px solid #120b05;
+  border: 3px solid #120b05;
 }
 
 .miner-head {
-  left: 10px;
+  left: 15px;
   top: 0;
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
   background: #c5865b;
+  z-index: 4;
+}
+
+.miner-head i {
+  position: absolute;
+  display: block;
+  border: 0;
+}
+
+.miner-hair {
+  left: -3px;
+  top: -3px;
+  width: 30px;
+  height: 9px;
+  background: #4c2915;
+  box-shadow: 22px 6px 0 #4c2915;
+}
+
+.miner-eye {
+  top: 13px;
+  width: 5px;
+  height: 5px;
+  background: #151515;
+}
+
+.miner-eye-left {
+  left: 7px;
+}
+
+.miner-eye-right {
+  right: 7px;
 }
 
 .miner-body {
-  left: 8px;
-  top: 22px;
-  width: 26px;
-  height: 24px;
-  background: #35a3d9;
+  left: 13px;
+  top: 30px;
+  width: 34px;
+  height: 31px;
+  background:
+    linear-gradient(90deg, #2676bd 0 28%, #35a3d9 28% 72%, #2676bd 72%),
+    #35a3d9;
+  z-index: 3;
 }
 
 .miner-arm {
-  top: 24px;
-  width: 10px;
-  height: 24px;
+  top: 33px;
+  width: 13px;
+  height: 32px;
   background: #b57750;
+  z-index: 2;
 }
 
 .miner-arm-left {
-  left: 0;
+  left: 1px;
 }
 
 .miner-arm-right {
   right: 0;
+  transform-origin: top center;
 }
 
 .miner-leg {
   bottom: 0;
-  width: 12px;
-  height: 22px;
+  width: 15px;
+  height: 31px;
   background: #273a94;
+  z-index: 1;
 }
 
 .miner-leg-left {
-  left: 7px;
+  left: 13px;
 }
 
 .miner-leg-right {
-  right: 7px;
+  right: 12px;
 }
 
 .miner-pickaxe {
-  right: -12px;
-  top: 6px;
-  width: 8px;
-  height: 34px;
+  right: -13px;
+  top: 15px;
+  width: 7px;
+  height: 46px;
   border-color: #120b05 !important;
   background: #7a4c2a;
-  transform: rotate(-35deg);
+  transform: rotate(-42deg);
   transform-origin: bottom center;
   opacity: 0;
+  z-index: 6;
 }
 
-.miner-pickaxe::before {
+.miner-pickaxe i {
   position: absolute;
-  top: -9px;
-  left: -13px;
-  width: 32px;
-  height: 8px;
+  top: -10px;
+  left: -17px;
+  display: block;
+  width: 39px;
+  height: 9px;
   background: #d2d6dd;
-  border: 2px solid #120b05;
-  content: "";
+  border: 3px solid #120b05;
 }
 
 .miner-down {
-  transform: translateX(3px) scaleX(0.92);
+  transform: translateX(4px);
+}
+
+.miner-down .miner-head {
+  transform: translateX(3px);
+}
+
+.miner-down .miner-eye-left {
+  left: 14px;
+}
+
+.miner-down .miner-eye-right {
+  right: 3px;
+}
+
+.miner-down .miner-arm-right {
+  transform: rotate(-42deg) translate(5px, -2px);
 }
 
 .miner-down .miner-pickaxe {
   opacity: 1;
-  animation: swing 180ms ease-in-out infinite alternate;
+  animation: swing 230ms steps(2, end) infinite alternate;
+}
+
+.miner-up {
+  animation: buildJump 340ms steps(2, end) infinite;
+}
+
+.miner-up .miner-head {
+  transform: translateY(5px);
+}
+
+.miner-up .miner-eye-left,
+.miner-up .miner-eye-right {
+  top: 19px;
 }
 
 .miner-up .miner-arm-right {
-  transform: translateY(-8px);
+  transform: rotate(30deg) translateY(4px);
+}
+
+.miner-up .miner-arm-left {
+  transform: rotate(-18deg);
 }
 
 .reveal {
-  opacity: 0;
-  transform: translateY(36px);
+  opacity: 1;
+  transform: none;
   transition: opacity 650ms ease, transform 650ms ease;
 }
 
-.reveal.visible {
+body.reveal-ready .reveal:not(.visible) {
+  opacity: 0;
+  transform: translateY(36px);
+}
+
+body.reveal-ready .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -1075,10 +1291,22 @@ main {
 
 @keyframes swing {
   from {
-    transform: rotate(-62deg);
+    transform: rotate(-74deg) translate(-6px, -8px);
   }
   to {
-    transform: rotate(18deg);
+    transform: rotate(-16deg) translate(6px, 4px);
+  }
+}
+
+@keyframes buildJump {
+  from {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-13px);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 
