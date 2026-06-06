@@ -4,6 +4,8 @@ const EMAIL = "kevinkdu23@gmail.com";
 const LINKEDIN_URL = "https://www.linkedin.com/in/kevin-upadhyay-45a959294";
 const GITHUB_URL = "https://github.com/kevinupadhyay";
 const PORTFOLIO_REPO_URL = "https://github.com/kevinupadhyay/Portfolio-";
+const CLAWCOURT_GITHUB_URL = "https://github.com/TanishqMathur4/ClawMarket";
+const ECOOFFSET_GITHUB_URL = "https://github.com/Harshal6927/ecoOffset";
 const ECOOFFSET_DEVPOST_URL =
   "https://devpost.com/software/ecooffset?_gl=1*4lvpmv*_gcl_au*MTU4NDU2OTI3LjE3ODA3Mjg2MTc.*_ga*MTU0ODgyNzU5My4xNzgwNzI4NjE4*_ga_0YHJK3Y10M*czE3ODA3Mjg2MTckbzEkZzEkdDE3ODA3Mjg2NDkkajI4JGwwJGgw";
 const RESUME_URL = "/Kevin-Upadhyay-Resume.pdf";
@@ -142,7 +144,8 @@ const projects = [
       "Built a Next.js dashboard featuring transaction lifecycle tracking, settlement monitoring, and AI referee terminal visualization.",
       "Integrated real-time transaction flows including escrow, validation, release, and refund states."
     ],
-    tags: ["Next.js", "Real-time", "AI", "Dashboard"]
+    tags: ["Next.js", "Real-time", "AI", "Dashboard"],
+    links: [{ label: "GitHub", href: CLAWCOURT_GITHUB_URL }]
   },
   {
     icon: "emerald-item",
@@ -155,7 +158,10 @@ const projects = [
       "Collaborated with teammates to rapidly prototype and present the solution."
     ],
     tags: ["React", "JavaScript", "Chrome Extension", "Sustainability"],
-    links: [{ label: "Devpost", href: ECOOFFSET_DEVPOST_URL }]
+    links: [
+      { label: "GitHub", href: ECOOFFSET_GITHUB_URL },
+      { label: "Devpost", href: ECOOFFSET_DEVPOST_URL }
+    ]
   },
   {
     icon: "redstone-item",
@@ -927,6 +933,14 @@ function TntMinesweeper({ onAchievement }) {
           </button>
         ))}
       </div>
+
+      {status === "won" && (
+        <div className="mc-confetti" aria-hidden="true">
+          {Array.from({ length: 30 }, (_, index) => (
+            <span key={index}></span>
+          ))}
+        </div>
+      )}
 
       {recruiterVisible && status === "playing" && (
         <div className="recruiter-message" role="status">

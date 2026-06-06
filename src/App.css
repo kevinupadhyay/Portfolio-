@@ -1903,6 +1903,7 @@ main {
 }
 
 .tnt-game {
+  position: relative;
   display: grid;
   gap: 20px;
   max-width: 760px;
@@ -2091,6 +2092,73 @@ main {
   width: min(100%, 510px);
   margin: 0 auto;
 }
+
+.mc-confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mc-confetti span {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #120b05;
+  background: #ffdf48;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.22);
+  animation: mcConfetti 1300ms steps(9, end) forwards;
+}
+
+.mc-confetti span:nth-child(2n) {
+  background: #55f0b2;
+}
+
+.mc-confetti span:nth-child(3n) {
+  background: #d84c32;
+}
+
+.mc-confetti span:nth-child(4n) {
+  background: #26d7d0;
+}
+
+.mc-confetti span:nth-child(5n) {
+  background: #8b5cf6;
+}
+
+.mc-confetti span:nth-child(1) { --x: -220px; --y: -180px; animation-delay: 0ms; }
+.mc-confetti span:nth-child(2) { --x: -170px; --y: -120px; animation-delay: 35ms; }
+.mc-confetti span:nth-child(3) { --x: -120px; --y: -210px; animation-delay: 70ms; }
+.mc-confetti span:nth-child(4) { --x: -80px; --y: -140px; animation-delay: 105ms; }
+.mc-confetti span:nth-child(5) { --x: -30px; --y: -230px; animation-delay: 140ms; }
+.mc-confetti span:nth-child(6) { --x: 35px; --y: -170px; animation-delay: 175ms; }
+.mc-confetti span:nth-child(7) { --x: 85px; --y: -220px; animation-delay: 210ms; }
+.mc-confetti span:nth-child(8) { --x: 135px; --y: -130px; animation-delay: 245ms; }
+.mc-confetti span:nth-child(9) { --x: 190px; --y: -190px; animation-delay: 280ms; }
+.mc-confetti span:nth-child(10) { --x: 235px; --y: -110px; animation-delay: 315ms; }
+.mc-confetti span:nth-child(11) { --x: -230px; --y: 10px; animation-delay: 30ms; }
+.mc-confetti span:nth-child(12) { --x: -170px; --y: 70px; animation-delay: 65ms; }
+.mc-confetti span:nth-child(13) { --x: -105px; --y: 120px; animation-delay: 100ms; }
+.mc-confetti span:nth-child(14) { --x: -45px; --y: 90px; animation-delay: 135ms; }
+.mc-confetti span:nth-child(15) { --x: 20px; --y: 135px; animation-delay: 170ms; }
+.mc-confetti span:nth-child(16) { --x: 70px; --y: 85px; animation-delay: 205ms; }
+.mc-confetti span:nth-child(17) { --x: 125px; --y: 140px; animation-delay: 240ms; }
+.mc-confetti span:nth-child(18) { --x: 175px; --y: 60px; animation-delay: 275ms; }
+.mc-confetti span:nth-child(19) { --x: 230px; --y: 115px; animation-delay: 310ms; }
+.mc-confetti span:nth-child(20) { --x: 255px; --y: 15px; animation-delay: 345ms; }
+.mc-confetti span:nth-child(21) { --x: -260px; --y: -70px; animation-delay: 95ms; }
+.mc-confetti span:nth-child(22) { --x: -205px; --y: 155px; animation-delay: 125ms; }
+.mc-confetti span:nth-child(23) { --x: -150px; --y: -250px; animation-delay: 155ms; }
+.mc-confetti span:nth-child(24) { --x: -10px; --y: 185px; animation-delay: 185ms; }
+.mc-confetti span:nth-child(25) { --x: 105px; --y: -260px; animation-delay: 215ms; }
+.mc-confetti span:nth-child(26) { --x: 250px; --y: -60px; animation-delay: 245ms; }
+.mc-confetti span:nth-child(27) { --x: -70px; --y: -275px; animation-delay: 275ms; }
+.mc-confetti span:nth-child(28) { --x: 165px; --y: 185px; animation-delay: 305ms; }
+.mc-confetti span:nth-child(29) { --x: -255px; --y: 85px; animation-delay: 335ms; }
+.mc-confetti span:nth-child(30) { --x: 270px; --y: -210px; animation-delay: 365ms; }
 
 .mine-tile {
   position: relative;
@@ -2757,6 +2825,24 @@ body.reveal-ready .reveal.visible {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mcConfetti {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2) rotate(0deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+    transform: translate(var(--x), var(--y)) scale(1) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--x) * 1.05), calc(var(--y) + 120px)) scale(0.8) rotate(270deg);
   }
 }
 
