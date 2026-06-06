@@ -1421,7 +1421,26 @@ export default function App() {
         <Contact />
         <NetherPortalBonus enderPearlCollected={enderPearlCollected} onAchievement={unlockAchievement} />
       </main>
-      <footer className="footer">Kevin Upadhyay / Built like a mining run, written like a portfolio.</footer>
+      <footer className="footer">
+        <div className="save-file">
+          <p>
+            <span>World Name:</span>
+            <strong>Kevin&apos;s Journey</strong>
+          </p>
+          <p>
+            <span>Game Mode:</span>
+            <strong>Survival</strong>
+          </p>
+          <p>
+            <span>Current Quest:</span>
+            <strong>Turning Ideas Into Reality</strong>
+          </p>
+          <p>
+            <span>Status:</span>
+            <strong>In Progress...</strong>
+          </p>
+        </div>
+      </footer>
     </>
   );
 }

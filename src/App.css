@@ -325,21 +325,25 @@ main {
 }
 
 .hero h1 {
-  margin: 0;
+  margin: 8px 0 0;
   color: #fff;
   font-family: var(--pixel);
   font-size: clamp(2.2rem, 8vw, 6.5rem);
-  line-height: 1.18;
-  text-shadow: 8px 8px 0 rgba(0, 0, 0, 0.28);
+  line-height: 1.24;
+  text-shadow:
+    6px 6px 0 rgba(0, 0, 0, 0.52),
+    10px 10px 0 rgba(0, 0, 0, 0.24);
 }
 
 .hero h1 span,
 .hero h1 strong {
   display: block;
+  position: relative;
 }
 
 .hero h1 strong {
   color: #ffdf48;
+  margin-top: 6px;
 }
 
 .subtitle-box {
@@ -2261,11 +2265,35 @@ main {
   border-top: 5px solid #000;
   background: #070606;
   color: #ffe39a;
-  padding: 24px;
-  text-align: center;
+  padding: 26px 18px;
   font-family: var(--pixel);
-  font-size: 0.65rem;
+}
+
+.save-file {
+  display: grid;
+  gap: 10px;
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.save-file p {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
   line-height: 1.8;
+}
+
+.save-file span {
+  color: #ffdf48;
+  font-size: clamp(0.56rem, 1.4vw, 0.68rem);
+}
+
+.save-file strong {
+  color: #fff8dc;
+  font-size: clamp(0.56rem, 1.4vw, 0.68rem);
+  font-weight: 400;
 }
 
 .mining-scrollbar {
