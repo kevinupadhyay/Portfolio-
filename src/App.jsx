@@ -667,55 +667,118 @@ function Projects({ onProjectInspect }) {
   );
 }
 
-function createMinesweeperBoard() {
-  const rows = 6;
-  const cols = 6;
-  const tntCount = 6;
-  const tntPositions = new Set();
+const MINE_ROWS = 6;
+const MINE_COLS = 6;
+const TNT_COUNT = 6;
 
-  while (tntPositions.size < tntCount) {
-    tntPositions.add(Math.floor(Math.random() * rows * cols));
+function createEmptyMinesweeperBoard() {
+  return Array.from({ length: MINE_ROWS * MINE_COLS }, (_, index) => ({
+    id: index,
+    nearby: 0,
+    reward: rewardTypes[index % rewardTypes.length],
+    revealed: false,
+    flagged: false,
+    tnt: false
+  }));
+}
+
+function getMineNeighbors(tileId) {
+  // Returns the standard Minesweeper neighborhood: up/down/left/right plus all
+  // four diagonals. Corner and edge tiles naturally return fewer valid neighbors.
+  const row = Math.floor(tileId / MINE_COLS);
+  const col = tileId % MINE_COLS;
+  const neighbors = [];
+
+  for (let rowOffset = -1; rowOffset <= 1; rowOffset += 1) {
+    for (let colOffset = -1; colOffset <= 1; colOffset += 1) {
+      if (rowOffset === 0 && colOffset === 0) continue;
+
+      const nextRow = row + rowOffset;
+      const nextCol = col + colOffset;
+      if (nextRow < 0 || nextRow >= MINE_ROWS || nextCol < 0 || nextCol >= MINE_COLS) continue;
+
+      neighbors.push(nextRow * MINE_COLS + nextCol);
+    }
   }
 
-  return Array.from({ length: rows * cols }, (_, index) => {
-    const row = Math.floor(index / cols);
-    const col = index % cols;
-    const nearby = [-1, 0, 1].reduce((count, rowOffset) => {
-      return (
-        count +
-        [-1, 0, 1].filter((colOffset) => {
-          if (rowOffset === 0 && colOffset === 0) return false;
-          const nextRow = row + rowOffset;
-          const nextCol = col + colOffset;
-          if (nextRow < 0 || nextRow >= rows || nextCol < 0 || nextCol >= cols) return false;
-          return tntPositions.has(nextRow * cols + nextCol);
-        }).length
-      );
-    }, 0);
+  return neighbors;
+}
+
+function createMinesweeperBoard(firstClickId) {
+  const tntPositions = new Set();
+  const protectedTiles = new Set([firstClickId, ...getMineNeighbors(firstClickId)]);
+  const availableTiles = Array.from({ length: MINE_ROWS * MINE_COLS }, (_, index) => index).filter(
+    (index) => !protectedTiles.has(index)
+  );
+
+  // First-click-safe generation: TNT is placed after the first click and kept out of
+  // the clicked tile plus its 8 surrounding neighbors, giving the player a useful opening.
+  while (tntPositions.size < TNT_COUNT && availableTiles.length > 0) {
+    const pickIndex = Math.floor(Math.random() * availableTiles.length);
+    const [pickedTile] = availableTiles.splice(pickIndex, 1);
+    tntPositions.add(pickedTile);
+  }
+
+  return Array.from({ length: MINE_ROWS * MINE_COLS }, (_, index) => {
+    // Neighbor counting uses standard Minesweeper rules: all 8 surrounding squares
+    // are counted, including diagonals. Edges/corners simply have fewer neighbors.
+    const nearby = getMineNeighbors(index).filter((neighborId) => tntPositions.has(neighborId)).length;
 
     return {
       id: index,
       nearby,
       reward: rewardTypes[index % rewardTypes.length],
       revealed: false,
+      flagged: false,
       tnt: tntPositions.has(index)
     };
   });
 }
 
+function revealSafeArea(tiles, startId) {
+  const nextTiles = tiles.map((tile) => ({ ...tile }));
+  const queue = [startId];
+  const visited = new Set();
+
+  while (queue.length > 0) {
+    const tileId = queue.shift();
+    if (visited.has(tileId)) continue;
+    visited.add(tileId);
+
+    const tile = nextTiles[tileId];
+    if (!tile || tile.flagged || tile.tnt) continue;
+
+    tile.revealed = true;
+    if (tile.nearby !== 0) continue;
+
+    getMineNeighbors(tileId).forEach((neighborId) => {
+      const neighbor = nextTiles[neighborId];
+      if (neighbor && !neighbor.revealed && !neighbor.flagged && !neighbor.tnt) {
+        queue.push(neighborId);
+      }
+    });
+  }
+
+  return nextTiles;
+}
+
 function TntMinesweeper({ onAchievement }) {
-  const [tiles, setTiles] = useState(() => createMinesweeperBoard());
+  const [tiles, setTiles] = useState(() => createEmptyMinesweeperBoard());
   const [status, setStatus] = useState("playing");
   const [showHelp, setShowHelp] = useState(false);
+  const [firstClick, setFirstClick] = useState(true);
   const [blockClicks, setBlockClicks] = useState(0);
   const [resets, setResets] = useState(0);
   const [recruiterVisible, setRecruiterVisible] = useState(false);
   const recruiterShownRef = useRef(false);
   const gameRootRef = useRef(null);
   const startTimeRef = useRef(Date.now());
+  const longPressTimerRef = useRef(null);
+  const longPressFlaggedRef = useRef(false);
 
   const safeTiles = tiles.filter((tile) => !tile.tnt).length;
   const revealedSafeTiles = tiles.filter((tile) => tile.revealed && !tile.tnt).length;
+  const flaggedTiles = tiles.filter((tile) => tile.flagged).length;
 
   const unlockRecruiterRetention = useCallback(() => {
     if (recruiterShownRef.current) return;
@@ -751,8 +814,10 @@ function TntMinesweeper({ onAchievement }) {
   }, []);
 
   const resetGame = () => {
-    setTiles(createMinesweeperBoard());
+    setTiles(createEmptyMinesweeperBoard());
     setStatus("playing");
+    setFirstClick(true);
+    startTimeRef.current = Date.now();
     setResets((current) => {
       const next = current + 1;
       if (next >= 3) unlockRecruiterRetention();
@@ -760,12 +825,26 @@ function TntMinesweeper({ onAchievement }) {
     });
   };
 
+  const hasWon = (nextTiles) => nextTiles.every((tile) => tile.tnt || tile.revealed);
+
+  const toggleFlag = (tileId) => {
+    if (status !== "playing") return;
+
+    // Flagging logic: right-click on desktop or long-press/tap flow on mobile marks a
+    // covered tile as suspected TNT. Flagged tiles cannot be mined until unflagged.
+    setTiles((currentTiles) =>
+      currentTiles.map((tile) =>
+        tile.id === tileId && !tile.revealed ? { ...tile, flagged: !tile.flagged } : tile
+      )
+    );
+  };
+
   const revealTile = (tileId) => {
     if (status !== "playing") return;
 
     setTiles((currentTiles) => {
       const selected = currentTiles.find((tile) => tile.id === tileId);
-      if (!selected || selected.revealed) return currentTiles;
+      if (!selected || selected.revealed || selected.flagged) return currentTiles;
 
       setBlockClicks((current) => {
         const next = current + 1;
@@ -773,15 +852,17 @@ function TntMinesweeper({ onAchievement }) {
         return next;
       });
 
-      const nextTiles = currentTiles.map((tile) => (tile.id === tileId ? { ...tile, revealed: true } : tile));
+      const seededTiles = firstClick ? createMinesweeperBoard(tileId) : currentTiles;
+      const freshSelected = seededTiles[tileId];
+      setFirstClick(false);
 
-      if (selected.tnt) {
+      if (freshSelected.tnt) {
         setStatus("lost");
-        return nextTiles.map((tile) => (tile.tnt ? { ...tile, revealed: true } : tile));
+        return seededTiles.map((tile) => (tile.tnt ? { ...tile, revealed: true } : tile));
       }
 
-      const nextRevealedSafeTiles = nextTiles.filter((tile) => tile.revealed && !tile.tnt).length;
-      if (nextRevealedSafeTiles === safeTiles) {
+      const nextTiles = revealSafeArea(seededTiles, tileId);
+      if (hasWon(nextTiles)) {
         setStatus("won");
         onAchievement("The End", "You cleared the dungeon.", 7000);
       }
@@ -800,7 +881,7 @@ function TntMinesweeper({ onAchievement }) {
               ? "TNT triggered. Reset the dungeon."
               : status === "won"
                 ? "Dungeon cleared. Safe blocks mined."
-                : `Safe blocks mined: ${revealedSafeTiles}/${safeTiles}`}
+                : `Safe blocks mined: ${revealedSafeTiles}/${safeTiles} / Flags: ${flaggedTiles}/${TNT_COUNT}`}
           </span>
         </div>
         <div className="tnt-game-actions">
@@ -816,12 +897,32 @@ function TntMinesweeper({ onAchievement }) {
       <div className={`mine-game-grid game-${status}`}>
         {tiles.map((tile) => (
           <button
-            className={`mine-tile ${tile.revealed ? "revealed" : ""} ${tile.tnt && tile.revealed ? "tnt" : ""} reward-${tile.reward}`}
+            className={`mine-tile ${tile.revealed ? "revealed" : ""} ${tile.flagged ? "flagged" : ""} ${tile.tnt && tile.revealed ? "tnt" : ""} reward-${tile.reward}`}
             type="button"
             key={tile.id}
-            aria-label={tile.revealed ? (tile.tnt ? "TNT" : `${tile.nearby} nearby TNT`) : "Hidden block"}
-            onClick={() => revealTile(tile.id)}
+            aria-label={tile.flagged ? "Flagged block" : tile.revealed ? (tile.tnt ? "TNT" : `${tile.nearby} nearby TNT`) : "Hidden block"}
+            onClick={() => {
+              if (longPressFlaggedRef.current) {
+                longPressFlaggedRef.current = false;
+                return;
+              }
+              revealTile(tile.id);
+            }}
+            onContextMenu={(event) => {
+              event.preventDefault();
+              toggleFlag(tile.id);
+            }}
+            onPointerDown={() => {
+              longPressFlaggedRef.current = false;
+              longPressTimerRef.current = window.setTimeout(() => {
+                longPressFlaggedRef.current = true;
+                toggleFlag(tile.id);
+              }, 520);
+            }}
+            onPointerUp={() => window.clearTimeout(longPressTimerRef.current)}
+            onPointerLeave={() => window.clearTimeout(longPressTimerRef.current)}
           >
+            {tile.flagged && !tile.revealed && <span className="flag-icon">!</span>}
             {tile.revealed && (tile.tnt ? <span className="tnt-icon">TNT</span> : <span>{tile.nearby || ""}</span>)}
           </button>
         ))}
@@ -849,12 +950,24 @@ function TntMinesweeper({ onAchievement }) {
               </button>
             </div>
             <ul>
-              <li>Click blocks to mine them.</li>
+              <li>Click a covered block to mine it.</li>
               <li>Avoid TNT.</li>
-              <li>Numbers show how many TNT blocks are nearby.</li>
+              <li>Numbers show how many TNT blocks are touching that block.</li>
+              <li>Touching means all 8 surrounding blocks: above, below, left, right, and diagonals.</li>
+              <li>Example: A block showing 1 means exactly one of its surrounding blocks is TNT.</li>
+              <li>Right-click a covered block to place or remove a flag.</li>
+              <li>On mobile, long-press a block to place or remove a flag.</li>
+              <li>Flag blocks you think contain TNT.</li>
               <li>Reveal all safe blocks to win.</li>
-              <li>Reset the dungeon anytime.</li>
             </ul>
+            <div className="neighbor-example" aria-label="Example of counted neighboring blocks">
+              {Array.from({ length: 9 }, (_, index) => (
+                <span className={index === 4 ? "center" : "neighbor"} key={index}>
+                  {index === 4 ? "1" : ""}
+                </span>
+              ))}
+            </div>
+            <p className="example-caption">The 8 highlighted blocks around the center are counted.</p>
           </div>
         </div>
       )}
