@@ -1,6 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const EMAIL = "kevinkdu23@gmail.com";
+const LINKEDIN_URL = "https://www.linkedin.com/in/kevin-upadhyay-45a959294";
+const GITHUB_URL = "https://github.com/kevinupadhyay";
+const PORTFOLIO_REPO_URL = "https://github.com/kevinupadhyay/Portfolio-";
+const ECOOFFSET_DEVPOST_URL =
+  "https://devpost.com/software/ecooffset?_gl=1*4lvpmv*_gcl_au*MTU4NDU2OTI3LjE3ODA3Mjg2MTc.*_ga*MTU0ODgyNzU5My4xNzgwNzI4NjE4*_ga_0YHJK3Y10M*czE3ODA3Mjg2MTckbzEkZzEkdDE3ODA3Mjg2NDkkajI4JGwwJGgw";
+const RESUME_URL = "/Kevin-Upadhyay-Resume.pdf";
 
 const navItems = [
   { id: "spawn", label: "Spawn", icon: "sky" },
@@ -9,7 +15,8 @@ const navItems = [
   { id: "iron", label: "Iron", icon: "iron" },
   { id: "diamond", label: "Diamond", icon: "diamond" },
   { id: "netherite", label: "Netherite", icon: "netherite" },
-  { id: "village", label: "Village", icon: "village" }
+  { id: "village", label: "Village", icon: "village" },
+  { id: "nether-portal", label: "Portal", icon: "netherite" }
 ];
 
 const playerStats = [
@@ -112,7 +119,19 @@ const leadership = [
 
 const projects = [
   {
-    featured: true,
+    icon: "diamond-item",
+    title: "Kevin Upadhyay Portfolio",
+    org: "Personal Portfolio Website",
+    date: "2026",
+    bullets: [
+      "Built a Minecraft-inspired interactive portfolio with a custom mining scrollbar, project inspection modals, animated pixel UI, custom cursors, and GitHub Pages deployment.",
+      "Designed the site to make my projects, experience, and contact information more memorable than a standard resume page.",
+      "Deployed using Vite, React, GitHub Actions, and GitHub Pages."
+    ],
+    tags: ["React", "Vite", "GitHub Pages", "GitHub Actions", "UI/UX", "Interactive Portfolio"],
+    links: [{ label: "GitHub", href: PORTFOLIO_REPO_URL }]
+  },
+  {
     icon: "diamond-item",
     title: "ClawCourt (Agent 58)",
     org: "OpenClaw Toronto Hackathon",
@@ -135,7 +154,8 @@ const projects = [
       "Developed features using React/JavaScript to provide sustainability-focused insights during online shopping.",
       "Collaborated with teammates to rapidly prototype and present the solution."
     ],
-    tags: ["React", "JavaScript", "Chrome Extension", "Sustainability"]
+    tags: ["React", "JavaScript", "Chrome Extension", "Sustainability"],
+    links: [{ label: "Devpost", href: ECOOFFSET_DEVPOST_URL }]
   },
   {
     icon: "redstone-item",
@@ -205,8 +225,8 @@ const awards = [
 ];
 
 const trades = [
-  ["LinkedIn", "blue", "https://www.linkedin.com/in/kevin-upadhyay-b64b23330"],
-  ["GitHub", "purple", "https://github.com/kevinupadhyay"],
+  ["LinkedIn", "blue", LINKEDIN_URL],
+  ["GitHub", "purple", GITHUB_URL],
   ["Email", "green", `mailto:${EMAIL}`],
   ["Phone", "orange", "tel:+14374224234"]
 ];
@@ -217,6 +237,8 @@ const quickInventory = [
   ["Build Style", "Hackathons, web apps, extensions, games"],
   ["Main Quest", "Build useful software and keep leveling up"]
 ];
+
+const rewardTypes = ["coal", "iron", "diamond", "emerald", "redstone", "lapis"];
 
 function useScrollState() {
   const [state, setState] = useState({ progress: 0, direction: "idle", active: "spawn" });
@@ -320,10 +342,10 @@ function MiningScrollbar({ progress, direction }) {
   const [dragging, setDragging] = useState(false);
   const totalBlocks = 44;
   const blockProgress = progress * totalBlocks;
-  const currentBlock = Math.min(Math.floor(progress * totalBlocks), totalBlocks - 1);
+  const currentBlock = Math.min(Math.floor(blockProgress + 0.75), totalBlocks - 1);
   const crackStage = Math.min(Math.floor((blockProgress % 1) * 4) + 1, 4);
   const minerState = getMinerState(direction, currentBlock, crackStage);
-  const footPosition = `clamp(112px, calc(${progress * 100}% + 12px), calc(100% - 4px))`;
+  const footPosition = `clamp(88px, calc(${progress * 100}% + 8px), calc(100% - 4px))`;
 
   const blocks = useMemo(
     () =>
@@ -418,6 +440,23 @@ function SectionTitle({ label, subtitle }) {
   );
 }
 
+function AchievementToasts({ toasts }) {
+  return (
+    <div className="achievement-stack" aria-live="polite" aria-atomic="false">
+      {toasts.map((toast) => (
+        <div className="achievement-toast" key={toast.id}>
+          <span className="achievement-icon" aria-hidden="true"></span>
+          <div>
+            <small>Achievement Unlocked:</small>
+            <strong>{toast.title}</strong>
+            {toast.detail && <p>{toast.detail}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Hero() {
   return (
     <section className="hero layer-sky" id="spawn">
@@ -435,7 +474,7 @@ function Hero() {
           <span>KEVIN</span>
           <strong>UPADHYAY</strong>
         </h1>
-        <div className="subtitle-box">Waterloo Math Student / Builder / Hacker / Developer</div>
+        <div className="subtitle-box">Waterloo Math Student / Builder / Researcher / Developer</div>
         <div className="hero-actions">
           <button className="pixel-button green" type="button" onClick={() => scrollToId("wood")}>
             START MINING
@@ -444,9 +483,6 @@ function Hero() {
             OPEN CHEST
           </button>
         </div>
-      </div>
-      <div className="floating-head" aria-hidden="true">
-        KU
       </div>
       <div className="grass-ground" aria-hidden="true"></div>
     </section>
@@ -559,8 +595,13 @@ function Leadership() {
   );
 }
 
-function Projects() {
+function Projects({ onProjectInspect }) {
   const [selectedProject, setSelectedProject] = useState(null);
+
+  const inspectProject = (project) => {
+    setSelectedProject(project);
+    onProjectInspect(project.title);
+  };
 
   useEffect(() => {
     if (!selectedProject) return undefined;
@@ -586,37 +627,322 @@ function Projects() {
       <div className="project-grid">
         {projects.map((item) => (
           <article
-            className={`project-card reveal ${item.featured ? "featured" : ""}`}
+            className="project-card reveal"
             key={item.title}
             role="button"
             tabIndex={0}
-            onClick={() => setSelectedProject(item)}
+            onClick={() => inspectProject(item)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                setSelectedProject(item);
+                inspectProject(item);
               }
             }}
           >
             <div className={`project-icon icon-${item.icon}`} aria-hidden="true"></div>
-            <div className="meta-line">
-              <span>{item.date}</span>
-              <span>{item.org}</span>
+            <div className="project-card-body">
+              <div className="meta-line">
+                <span>{item.date}</span>
+                <span>{item.org}</span>
+              </div>
+              <h2>{item.title}</h2>
+              {item.awards && <p className="award-line">Awards: {item.awards}</p>}
+              <ul>
+                {item.bullets.map((bullet) => (
+                  <li key={bullet}>{bullet}</li>
+                ))}
+              </ul>
             </div>
-            <h2>{item.title}</h2>
-            {item.awards && <p className="award-line">Awards: {item.awards}</p>}
-            <ul>
-              {item.bullets.map((bullet) => (
-                <li key={bullet}>{bullet}</li>
-              ))}
-            </ul>
-            <TagRow tags={item.tags} />
-            <div className="inspect-label">Inspect Project</div>
+            <div className="project-card-actions">
+              <TagRow tags={item.tags} />
+              <div className="inspect-label">Inspect Project</div>
+            </div>
           </article>
         ))}
       </div>
       {selectedProject && (
         <ProjectInspectionModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      )}
+    </section>
+  );
+}
+
+function createMinesweeperBoard() {
+  const rows = 6;
+  const cols = 6;
+  const tntCount = 6;
+  const tntPositions = new Set();
+
+  while (tntPositions.size < tntCount) {
+    tntPositions.add(Math.floor(Math.random() * rows * cols));
+  }
+
+  return Array.from({ length: rows * cols }, (_, index) => {
+    const row = Math.floor(index / cols);
+    const col = index % cols;
+    const nearby = [-1, 0, 1].reduce((count, rowOffset) => {
+      return (
+        count +
+        [-1, 0, 1].filter((colOffset) => {
+          if (rowOffset === 0 && colOffset === 0) return false;
+          const nextRow = row + rowOffset;
+          const nextCol = col + colOffset;
+          if (nextRow < 0 || nextRow >= rows || nextCol < 0 || nextCol >= cols) return false;
+          return tntPositions.has(nextRow * cols + nextCol);
+        }).length
+      );
+    }, 0);
+
+    return {
+      id: index,
+      nearby,
+      reward: rewardTypes[index % rewardTypes.length],
+      revealed: false,
+      tnt: tntPositions.has(index)
+    };
+  });
+}
+
+function TntMinesweeper({ onAchievement }) {
+  const [tiles, setTiles] = useState(() => createMinesweeperBoard());
+  const [status, setStatus] = useState("playing");
+  const [showHelp, setShowHelp] = useState(false);
+  const [blockClicks, setBlockClicks] = useState(0);
+  const [resets, setResets] = useState(0);
+  const [recruiterVisible, setRecruiterVisible] = useState(false);
+  const recruiterShownRef = useRef(false);
+  const gameRootRef = useRef(null);
+  const startTimeRef = useRef(Date.now());
+
+  const safeTiles = tiles.filter((tile) => !tile.tnt).length;
+  const revealedSafeTiles = tiles.filter((tile) => tile.revealed && !tile.tnt).length;
+
+  const unlockRecruiterRetention = useCallback(() => {
+    if (recruiterShownRef.current) return;
+    recruiterShownRef.current = true;
+    setRecruiterVisible(true);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (status === "playing" && Date.now() - startTimeRef.current >= 60000) {
+        unlockRecruiterRetention();
+      }
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [status, unlockRecruiterRetention]);
+
+  useEffect(() => {
+    const root = gameRootRef.current;
+    if (!root) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          setRecruiterVisible(false);
+        }
+      },
+      { threshold: 0.08 }
+    );
+
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
+
+  const resetGame = () => {
+    setTiles(createMinesweeperBoard());
+    setStatus("playing");
+    setResets((current) => {
+      const next = current + 1;
+      if (next >= 3) unlockRecruiterRetention();
+      return next;
+    });
+  };
+
+  const revealTile = (tileId) => {
+    if (status !== "playing") return;
+
+    setTiles((currentTiles) => {
+      const selected = currentTiles.find((tile) => tile.id === tileId);
+      if (!selected || selected.revealed) return currentTiles;
+
+      setBlockClicks((current) => {
+        const next = current + 1;
+        if (next >= 20) unlockRecruiterRetention();
+        return next;
+      });
+
+      const nextTiles = currentTiles.map((tile) => (tile.id === tileId ? { ...tile, revealed: true } : tile));
+
+      if (selected.tnt) {
+        setStatus("lost");
+        return nextTiles.map((tile) => (tile.tnt ? { ...tile, revealed: true } : tile));
+      }
+
+      const nextRevealedSafeTiles = nextTiles.filter((tile) => tile.revealed && !tile.tnt).length;
+      if (nextRevealedSafeTiles === safeTiles) {
+        setStatus("won");
+        onAchievement("The End", "You cleared the dungeon.", 7000);
+      }
+
+      return nextTiles;
+    });
+  };
+
+  return (
+    <div className="tnt-game reveal visible" ref={gameRootRef}>
+      <div className="tnt-game-header">
+        <div>
+          <p>TNT Minesweeper</p>
+          <span>
+            {status === "lost"
+              ? "TNT triggered. Reset the dungeon."
+              : status === "won"
+                ? "Dungeon cleared. Safe blocks mined."
+                : `Safe blocks mined: ${revealedSafeTiles}/${safeTiles}`}
+          </span>
+        </div>
+        <div className="tnt-game-actions">
+          <button type="button" onClick={() => setShowHelp((current) => !current)}>
+            How to Play
+          </button>
+          <button type="button" onClick={resetGame}>
+            Reset Game
+          </button>
+        </div>
+      </div>
+
+      <div className={`mine-game-grid game-${status}`}>
+        {tiles.map((tile) => (
+          <button
+            className={`mine-tile ${tile.revealed ? "revealed" : ""} ${tile.tnt && tile.revealed ? "tnt" : ""} reward-${tile.reward}`}
+            type="button"
+            key={tile.id}
+            aria-label={tile.revealed ? (tile.tnt ? "TNT" : `${tile.nearby} nearby TNT`) : "Hidden block"}
+            onClick={() => revealTile(tile.id)}
+          >
+            {tile.revealed && (tile.tnt ? <span className="tnt-icon">TNT</span> : <span>{tile.nearby || ""}</span>)}
+          </button>
+        ))}
+      </div>
+
+      {recruiterVisible && status === "playing" && (
+        <div className="recruiter-message" role="status">
+          <button type="button" aria-label="Close recruiter message" onClick={() => setRecruiterVisible(false)}>
+            X
+          </button>
+          <small>Achievement Unlocked:</small>
+          <strong>Recruiter Retention</strong>
+          <p>Looks like you’ve been mining here for a while... maybe it’s time to recruit Kevin?</p>
+        </div>
+      )}
+
+      {showHelp && (
+        <div className="how-to-play-modal" role="dialog" aria-modal="true" aria-labelledby="how-to-play-title">
+          <button className="how-to-play-backdrop" type="button" aria-label="Close how to play" onClick={() => setShowHelp(false)}></button>
+          <div className="how-to-play">
+            <div className="inventory-header">
+              <h2 id="how-to-play-title">[ HOW TO PLAY ]</h2>
+              <button className="inventory-close" type="button" onClick={() => setShowHelp(false)} aria-label="Close how to play">
+                X
+              </button>
+            </div>
+            <ul>
+              <li>Click blocks to mine them.</li>
+              <li>Avoid TNT.</li>
+              <li>Numbers show how many TNT blocks are nearby.</li>
+              <li>Reveal all safe blocks to win.</li>
+              <li>Reset the dungeon anytime.</li>
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NetherPortalBonus({ enderPearlCollected, onAchievement }) {
+  const gateRef = useRef(null);
+  const gameRef = useRef(null);
+  const [portalSeen, setPortalSeen] = useState(false);
+  const [entering, setEntering] = useState(false);
+  const [gameOpen, setGameOpen] = useState(false);
+  const portalActivated = portalSeen && enderPearlCollected;
+
+  useEffect(() => {
+    const gate = gateRef.current;
+    if (!gate) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPortalSeen(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.42 }
+    );
+
+    observer.observe(gate);
+    return () => observer.disconnect();
+  }, [onAchievement]);
+
+  const enterPortal = () => {
+    if (entering || !portalActivated) return;
+
+    setEntering(true);
+    onAchievement("Entered Nether Portal");
+
+    setTimeout(() => {
+      setGameOpen(true);
+      setEntering(false);
+      setTimeout(() => {
+        const gameTop = gameRef.current?.getBoundingClientRect().top;
+        if (typeof gameTop === "number") {
+          window.scrollTo({ top: window.scrollY + gameTop - 96, behavior: "smooth" });
+        }
+      }, 80);
+    }, 950);
+  };
+
+  return (
+    <section
+      className={`layer layer-portal-gate ${portalActivated ? "portal-is-active" : ""} ${entering ? "portal-is-entering" : ""}`}
+      id="nether-portal"
+      ref={gateRef}
+    >
+      <SectionTitle label="[ NETHER PORTAL ]" subtitle="Enter the portal to play TNT Minesweeper." />
+
+      <div className="portal-area reveal">
+        <div className="portal-status">
+          <span>{portalActivated ? "Portal Activated" : "Place the Ender Pearl in your inventory to activate the portal."}</span>
+        </div>
+        <button
+          className="portal"
+          type="button"
+          data-cursor="portal"
+          aria-label={portalActivated ? "Enter TNT Minesweeper" : "Dormant portal"}
+          disabled={!portalActivated || entering}
+          onClick={enterPortal}
+        >
+          <span className="portal-frame portal-top"></span>
+          <span className="portal-frame portal-left"></span>
+          <span className="portal-frame portal-right"></span>
+          <span className="portal-frame portal-bottom"></span>
+          <span className="portal-center"></span>
+          <span className="portal-particles"></span>
+        </button>
+        <button className="pixel-button purple enter-portal" type="button" onClick={enterPortal} disabled={!portalActivated || entering}>
+          ENTER PORTAL
+        </button>
+      </div>
+
+      {entering && <div className="portal-transition" aria-hidden="true"></div>}
+      {gameOpen && (
+        <div ref={gameRef}>
+          <TntMinesweeper onAchievement={onAchievement} />
+        </div>
       )}
     </section>
   );
@@ -666,11 +992,15 @@ function ProjectInspectionModal({ project, onClose }) {
           </ul>
         </div>
 
-        <div className="inventory-actions">
-          <button type="button">GitHub Coming Soon</button>
-          <button type="button">Demo Coming Soon</button>
-          <button type="button">Devpost Coming Soon</button>
-        </div>
+        {project.links?.length > 0 && (
+          <div className="inventory-actions">
+            {project.links.map((link) => (
+              <a href={link.href} key={link.label} target="_blank" rel="noreferrer">
+                {link.label}
+              </a>
+            ))}
+          </div>
+        )}
       </article>
     </div>
   );
@@ -686,8 +1016,29 @@ function TagRow({ tags }) {
   );
 }
 
-function SkillsAndChest() {
+function SkillsAndChest({ enderPearlCollected, onCollectEnderPearl }) {
   const [open, setOpen] = useState(false);
+  const [pearlSelected, setPearlSelected] = useState(false);
+  const [draggingPearl, setDraggingPearl] = useState(false);
+  const [pearlPlaced, setPearlPlaced] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.toggle("dragging-pearl", draggingPearl);
+    return () => document.body.classList.remove("dragging-pearl");
+  }, [draggingPearl]);
+
+  const openChest = () => {
+    setOpen(true);
+    setPearlSelected(false);
+    setPearlPlaced(false);
+  };
+
+  const collectPearl = () => {
+    setPearlSelected(false);
+    setDraggingPearl(false);
+    setPearlPlaced(true);
+    onCollectEnderPearl();
+  };
 
   return (
     <section className="layer layer-netherite" id="netherite">
@@ -723,26 +1074,78 @@ function SkillsAndChest() {
         ))}
       </div>
 
+      <div className="stronghold-heading">
+        <SectionTitle label="[ STRONGHOLD CHEST ]" subtitle="A strange chest waits near the end of the journey..." />
+      </div>
       <div className={`resume-chest reveal ${open ? "open" : ""}`} id="resume-chest">
-        <button type="button" className="chest" onClick={() => setOpen(true)} aria-expanded={open}>
+        <button type="button" className="chest" onClick={openChest} aria-expanded={open}>
           <span className="chest-lid"></span>
           <span className="chest-base"></span>
           <span className="chest-lock"></span>
         </button>
         <div className="chest-copy">
-          <h2>Resume Chest</h2>
-          <p>{open ? "EASTER EGG FOUND: CHEST OPENED!" : "Click the chest to unlock contact loot."}</p>
+          <h2>Stronghold Chest</h2>
+          <p>{pearlPlaced ? "Ender Pearl Added to Inventory" : open ? "Ender Pearl Found" : "Click the chest to reveal the portal key."}</p>
         </div>
         {open && (
-          <div className="chest-items">
-            <span>Resume PDF Coming Soon</span>
-            <a href="https://www.linkedin.com/in/kevin-upadhyay-b64b23330" target="_blank" rel="noreferrer">
-              LinkedIn
-            </a>
-            <a href="https://github.com/kevinupadhyay" target="_blank" rel="noreferrer">
-              GitHub
-            </a>
-            <a href={`mailto:${EMAIL}`}>Email</a>
+          <div className="chest-inventory" aria-label="Stronghold chest inventory">
+            <div className="chest-instructions">
+              <strong>{pearlPlaced ? "Ender Pearl Added to Inventory" : "Ender Pearl Found"}</strong>
+              <span>{pearlPlaced ? "The Nether Portal is active." : "Drag it into your inventory, then enter the portal for a surprise challenge."}</span>
+            </div>
+            <div className="inventory-screen">
+              <section className="inventory-panel">
+                <h3>Chest</h3>
+                <div className="inventory-slot-grid chest-slot-grid">
+                  {Array.from({ length: 9 }, (_, index) => (
+                    <div className="mc-inventory-slot" key={`chest-${index}`}>
+                      {index === 0 && !pearlPlaced && (
+                        <button
+                          className={`ender-pearl-item ${pearlSelected ? "selected" : ""}`}
+                          type="button"
+                          draggable
+                          aria-label="Ender Pearl"
+                          onClick={() => setPearlSelected(true)}
+                          onDragStart={(event) => {
+                            event.dataTransfer.setData("text/plain", "ender-pearl");
+                            setDraggingPearl(true);
+                            setPearlSelected(true);
+                          }}
+                          onDragEnd={() => setDraggingPearl(false)}
+                        >
+                          <span className="ender-pearl" aria-hidden="true"></span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+              <section className="inventory-panel">
+                <h3>Inventory</h3>
+                <div className="inventory-slot-grid player-slot-grid">
+                  {Array.from({ length: 9 }, (_, index) => (
+                    <button
+                      className={`mc-inventory-slot inventory-target ${pearlPlaced && index === 0 ? "filled" : ""} ${pearlSelected ? "ready" : ""}`}
+                      type="button"
+                      key={`inventory-${index}`}
+                      aria-label={`Inventory slot ${index + 1}`}
+                      onClick={() => {
+                        if (pearlSelected && !pearlPlaced) collectPearl();
+                      }}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={(event) => {
+                        event.preventDefault();
+                        if (event.dataTransfer.getData("text/plain") === "ender-pearl") {
+                          collectPearl();
+                        }
+                      }}
+                    >
+                      {pearlPlaced && index === 0 && <span className="ender-pearl" aria-hidden="true"></span>}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            </div>
           </div>
         )}
       </div>
@@ -786,9 +1189,14 @@ function Contact() {
 
       <div className="coordinates reveal">
         <p>Email: {EMAIL} / Phone: +1 (437) 422-4234 / Location: Waterloo, ON</p>
-        <button className="pixel-button green" type="button" onClick={copyEmail}>
-          {copied ? "COPIED!" : "COPY EMAIL"}
-        </button>
+        <div className="contact-actions">
+          <button className="pixel-button green" type="button" onClick={copyEmail}>
+            {copied ? "COPIED!" : "COPY EMAIL"}
+          </button>
+          <a className="pixel-button brown" href={RESUME_URL} download>
+            Download Resume
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -817,11 +1225,63 @@ function RevealController() {
 
 export default function App() {
   const scroll = useScrollState();
+  const [achievements, setAchievements] = useState([]);
+  const [achievementToasts, setAchievementToasts] = useState([]);
+  const [inspectedProjects, setInspectedProjects] = useState([]);
+  const [enderPearlCollected, setEnderPearlCollected] = useState(() => {
+    try {
+      return window.localStorage.getItem("kevin-ender-pearl") === "collected";
+    } catch {
+      return false;
+    }
+  });
+  const unlockedAchievementsRef = useRef(new Set());
+
+  const unlockAchievement = useCallback((title, detail = "", duration = 4200) => {
+    if (unlockedAchievementsRef.current.has(title)) return;
+    unlockedAchievementsRef.current.add(title);
+
+    const id = `${title}-${Date.now()}`;
+    setAchievements((current) => (current.includes(title) ? current : [...current, title]));
+    setAchievementToasts((toasts) => [...toasts, { id, title, detail }]);
+    window.setTimeout(() => {
+      setAchievementToasts((toasts) => toasts.filter((toast) => toast.id !== id));
+    }, duration);
+  }, []);
+
+  const collectEnderPearl = useCallback(() => {
+    setEnderPearlCollected(true);
+    try {
+      window.localStorage.setItem("kevin-ender-pearl", "collected");
+    } catch {
+      // localStorage can be unavailable in some privacy modes.
+    }
+    unlockAchievement("Eye of Ender");
+  }, [unlockAchievement]);
+
+  const inspectProject = useCallback(
+    (title) => {
+      setInspectedProjects((current) => (current.includes(title) ? current : [...current, title]));
+      unlockAchievement("Inspected First Project");
+    },
+    [unlockAchievement]
+  );
+
+  useEffect(() => {
+    if (scroll.active !== "spawn") {
+      unlockAchievement("Started Mining");
+    }
+
+    if (scroll.active === "diamond") {
+      unlockAchievement("Reached Diamond Layer");
+    }
+  }, [scroll.active, unlockAchievement]);
 
   return (
     <>
       <CustomCursor />
       <RevealController />
+      <AchievementToasts toasts={achievementToasts} />
       <Navbar active={scroll.active} />
       <MiningScrollbar progress={scroll.progress} direction={scroll.direction} />
       <main>
@@ -829,9 +1289,10 @@ export default function App() {
         <WoodAge />
         <Experience />
         <Leadership />
-        <Projects />
-        <SkillsAndChest />
+        <Projects onProjectInspect={inspectProject} />
+        <SkillsAndChest enderPearlCollected={enderPearlCollected} onCollectEnderPearl={collectEnderPearl} />
         <Contact />
+        <NetherPortalBonus enderPearlCollected={enderPearlCollected} onAchievement={unlockAchievement} />
       </main>
       <footer className="footer">Kevin Upadhyay / Built like a mining run, written like a portfolio.</footer>
     </>
